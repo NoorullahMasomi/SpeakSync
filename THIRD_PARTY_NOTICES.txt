@@ -1,0 +1,20 @@
+SpeakSync uses these free programs. Thank you to their makers.
+
+FFmpeg (bin\ffmpeg.exe)
+  Used to read videos, clean recordings and make the finished video.
+  FFmpeg is made by the FFmpeg developers - https://ffmpeg.org
+  This build ("essentials", from https://www.gyan.dev/ffmpeg/builds/, shipped by the imageio-ffmpeg
+  package) is licensed under the GNU General Public License version 3 (GPLv3).
+  The full license: https://www.gnu.org/licenses/gpl-3.0.html
+  The source code of FFmpeg: https://ffmpeg.org/download.html#get-sources
+  ffmpeg.exe is a separate program that SpeakSync starts; it is not changed by SpeakSync.
+
+Python (the language SpeakSync is written in) - Python Software Foundation License
+  https://docs.python.org/3/license.html
+
+PyInstaller (packs SpeakSync into SpeakSync.exe) - GPL 2.0 with an exception that allows
+  packed programs to use any license. https://pyinstaller.org
+
+Tcl/Tk (file open / save windows) - BSD-style license. https://www.tcl.tk/software/tcltk/license.html
+
+Microsoft Edge WebView (the app window) is part of Windows and is not shipped with SpeakSync.

@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SpeakSync</title>
+<link rel="icon" href="/static/icon.svg">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<header id="top">
+  <span class="logo"><img src="/static/icon.svg" alt="">SpeakSync</span>
+  <nav id="tabs" hidden>
+    <button data-tab="mark"><span class="n">1</span><span data-i18n="tab_mark">Mark</span></button>
+    <button data-tab="record"><span class="n">2</span><span data-i18n="tab_record">Record</span></button>
+    <button data-tab="make"><span class="n">3</span><span data-i18n="tab_make">Make video</span></button>
+  </nav>
+  <span id="projName"></span>
+  <span class="grow"></span>
+  <span id="update" hidden><span id="updateText"></span><button class="primary" id="updateBtn" data-i18n="update_get">Get it</button></span>
+  <select id="uiLang" title="Language">
+    <option value="en">English</option>
+    <option value="fa">دری</option>
+  </select>
+  <button id="helpBtn" data-i18n="help">Help</button>
+  <button id="closeBtn" hidden data-i18n="close_project">Close project</button>
+</header>
+
+<main>
+  <!-- ============================================================ home -->
+  <section id="home">
+    <div class="home-in">
+      <div class="hero">
+        <img src="/static/icon.svg" alt="">
+        <div>
+          <h1 data-i18n="home_title">Your voice on any video</h1>
+          <p data-i18n="home_sub">Mark where you speak, read your script when the light is green, and get a finished video.</p>
+        </div>
+      </div>
+      <div class="row">
+        <button class="primary big" id="newBtn" data-i18n="new_project">+ New project</button>
+        <button class="big" id="openBtn" data-i18n="open_project">Open project…</button>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="n">1</span><b data-i18n="s1_t">Add video and script</b><p data-i18n="s1_p">Choose any video. Paste your text: a blank line starts a new part.</p></div>
+        <div class="step"><span class="n">2</span><b data-i18n="s2_t">Mark where you speak</b><p data-i18n="s2_p">Play the video and press M where you start talking and M again where you stop.</p></div>
+        <div class="step"><span class="n">3</span><b data-i18n="s3_t">Read and record</b><p data-i18n="s3_p">Red = wait, yellow = get ready, green = speak. Then press Make video.</p></div>
+      </div>
+      <div class="card" id="recentCard" hidden>
+        <h3 data-i18n="recent">Recent projects</h3>
+        <div id="recent"></div>
+      </div>
+      <div class="foot"><span id="aboutLine"></span> · <a href="#" id="aboutLink" data-i18n="about">About</a></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ 1 mark -->
+  <section id="mark" hidden>
+    <div id="markLeft">
+      <div class="vbox" id="markVideo"></div>
+      <div class="transport">
+        <button id="playBtn" title="K">▶</button>
+        <span class="time" id="timeNow">0:00.0</span>
+        <button data-step="-5">−5s</button><button data-step="-1">−1s</button><button data-step="-0.1">−0.1</button>
+        <button data-step="0.1">+0.1</button><button data-step="1">+1s</button><button data-step="5">+5s</button>
+        <select id="rate"><option value="0.5">0.5×</option><option value="0.75">0.75×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option></select>
+        <span class="grow"></span>
+        <button id="markBtn"><kbd>M</kbd> <span id="markLbl"></span></button>
+      </div>
+      <canvas id="timeline"></canvas>
+      <div class="tl-help" data-i18n="tl_help">Click = go there · drag a part's edge = change its time · mouse wheel = zoom · K or Space = play / pause · ← → = 1 s</div>
+    </div>
+    <aside id="markRight">
+      <div class="side-head">
+        <h3 data-i18n="parts">Parts</h3>
+        <button id="addPartBtn" data-i18n="add_part">+ Part</button>
+        <span class="menu"><button id="scriptMenuBtn" data-i18n="script_menu">Script ▾</button>
+          <span class="list" id="scriptMenu" hidden>
+            <button data-act="paste" data-i18n="sc_paste">Paste a script…</button>
+            <button data-act="import" data-i18n="sc_import">Open a script / subtitle file…</button>
+            <button data-act="savetxt" data-i18n="sc_savetxt">Save the script (.txt)…</button>
+            <button data-act="savesrt" data-i18n="sc_savesrt">Save subtitles (.srt)…</button>
+            <button data-act="clear" class="danger" data-i18n="sc_clear">Remove all parts…</button>
+          </span></span>
+      </div>
+      <div id="parts"></div>
+    </aside>
+  </section>
+
+  <!-- ============================================================ 2 record -->
+  <section id="record" hidden>
+    <div id="recLeft">
+      <div id="light" class="wait">
+        <span class="dot"></span>
+        <div><div class="big" id="lightBig"></div><div class="small" id="lightSmall"></div></div>
+        <span class="timer" id="lightTimer"></span>
+      </div>
+      <div id="timebar"><i id="timebarFill"></i></div>
+      <div id="reader"><div id="readerHead"></div><div id="readText"></div><div id="nextText"></div></div>
+      <div id="recKeys">
+        <button class="primary" id="goBtn"></button>
+        <button id="redoBtn"><kbd>R</kbd> <span data-i18n="k_redo">Record again</span></button>
+        <button id="listenBtn"><kbd>L</kbd> <span data-i18n="k_listen">Listen</span></button>
+        <button id="backBtn"><kbd>↑</kbd> <span data-i18n="k_back">Back</span></button>
+        <button id="fwdBtn"><kbd>↓</kbd> <span data-i18n="k_next">Next</span></button>
+        <button id="pauseBtn"><kbd>Esc</kbd> <span data-i18n="k_stop">Stop</span></button>
+        <span class="grow"></span>
+        <span id="recStatus" class="dim"></span>
+      </div>
+    </div>
+    <aside id="recRight">
+      <div class="vbox" id="recVideo"></div>
+      <div id="recOpts">
+        <div class="row"><span data-i18n="timing">Timing</span>
+          <span class="seg" id="modeSeg"><button data-mode="fit" data-i18n="mode_fit">Voice fits the video</button><button data-mode="wait" data-i18n="mode_wait">Video waits for me</button></span></div>
+        <div class="row"><select id="micSel" class="grow" title="Microphone"></select><span class="meter"><i id="meter"></i></span></div>
+        <div class="row">
+          <label class="chk"><input type="checkbox" id="hearChk"> <span data-i18n="hear">Hear the video</span></label>
+          <label class="chk"><input type="checkbox" id="guideChk" checked> <span data-i18n="guide">Pace guide</span></label>
+          <label class="chk"><input type="checkbox" id="autoChk" checked> <span data-i18n="auto_next">Go on by itself</span></label>
+        </div>
+      </div>
+      <div id="recList"></div>
+    </aside>
+  </section>
+
+  <!-- ============================================================ 3 make -->
+  <section id="make" hidden>
+    <div class="make-in">
+      <div class="card">
+        <h3 data-i18n="mk_ready">Ready?</h3>
+        <div id="mkSummary"></div>
+        <div id="missing"></div>
+      </div>
+      <div class="card">
+        <h3 data-i18n="mk_settings">Settings</h3>
+        <div class="opt"><div class="lbl"><b data-i18n="timing">Timing</b></div>
+          <div class="choice" id="modeChoice">
+            <label data-mode="fit"><input type="radio" name="mode" value="fit"><div><b data-i18n="mode_fit">Voice fits the video</b><span data-i18n="mode_fit_p">The video stays the same length. Each recording starts at its mark. A recording that is too long is played up to 25% faster.</span></div></label>
+            <label data-mode="wait"><input type="radio" name="mode" value="wait"><div><b data-i18n="mode_wait">Video waits for me</b><span data-i18n="mode_wait_p">When you talk longer than a part, the picture stops at the end of the part until you finish. Best for lessons, slides and screen recordings.</span></div></label>
+          </div></div>
+        <div class="opt"><div class="lbl"><b data-i18n="bg_vol">Original sound</b><span data-i18n="bg_vol_p">0 = no original sound</span></div>
+          <div class="row"><input type="range" id="bgVol" min="0" max="100" step="5"><span id="bgVolTxt"></span></div></div>
+        <div class="opt"><div class="lbl"><b data-i18n="duck">Quieter while I speak</b></div>
+          <label class="chk"><input type="checkbox" id="duckChk"> <span data-i18n="duck_p">Make the original sound quieter under my voice</span></label></div>
+        <div class="opt"><div class="lbl"><b data-i18n="voice_vol">My voice</b></div>
+          <div class="row"><input type="range" id="voiceVol" min="50" max="200" step="10"><span id="voiceVolTxt"></span></div></div>
+        <div class="opt" id="speedRow"><div class="lbl"><b data-i18n="speed_fit">Too long?</b></div>
+          <label class="chk"><input type="checkbox" id="speedChk"> <span data-i18n="speed_fit_p">Play a too-long recording a little faster (max 1.25×)</span></label></div>
+      </div>
+      <div class="card">
+        <div class="row">
+          <button class="primary big" id="makeBtn" data-i18n="make_btn">Make video…</button>
+          <button id="cancelBtn" hidden data-i18n="cancel">Cancel</button>
+          <span id="mkStage" class="dim"></span>
+        </div>
+        <div id="progress" style="margin-top:12px" hidden><i id="progressFill"></i></div>
+        <div id="mkResult" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============================================================ dialogs -->
+<div class="modal" id="newDlg" hidden>
+  <div class="box">
+    <h2 data-i18n="new_project_t">New project</h2>
+    <div class="field"><label data-i18n="f_video">1. Your video</label>
+      <div class="pathline"><span class="val" id="nVideo"></span><button class="primary" id="nVideoBtn" data-i18n="choose">Choose…</button></div></div>
+    <div class="field"><label data-i18n="f_name">2. Project name</label><input type="text" id="nName" maxlength="80"></div>
+    <div class="field"><label data-i18n="f_folder">3. Keep the project in this folder</label>
+      <div class="pathline"><span class="val" id="nFolder"></span><button id="nFolderBtn" data-i18n="change">Change…</button></div></div>
+    <div class="field"><label data-i18n="f_script">4. Your script (you can add or change it later)</label>
+      <textarea id="nScript" rows="7" dir="auto"></textarea>
+      <div class="dim" style="font-size:13px" data-i18n="f_script_p">A blank line starts a new part. You can put the time in front: [0:01 - 0:03] Hello!</div></div>
+    <div class="row"><span class="grow"></span><button id="nCancel" data-i18n="cancel">Cancel</button><button class="primary" id="nCreate" data-i18n="create">Create project</button></div>
+  </div>
+</div>
+
+<div class="modal" id="pasteDlg" hidden>
+  <div class="box">
+    <h2 data-i18n="paste_t">Paste your script</h2>
+    <textarea id="pasteText" rows="14" dir="auto"></textarea>
+    <pre class="example">[0:01 - 0:03] Hello and welcome.
+
+[0:05 - 0:12] Today I show you how to ...
+
+A part without a time gets its time when you mark it.</pre>
+    <label class="chk"><input type="checkbox" id="pasteReplace"> <span data-i18n="paste_replace">Replace all parts (otherwise the text goes into the parts you already have, in order)</span></label>
+    <div class="row"><span class="grow"></span><button id="pasteCancel" data-i18n="cancel">Cancel</button><button class="primary" id="pasteOk" data-i18n="use_script">Use this script</button></div>
+  </div>
+</div>
+
+<div class="modal" id="helpDlg" hidden>
+  <div class="box help" id="helpBox"></div>
+</div>
+
+<div id="toast" hidden></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
