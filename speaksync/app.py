@@ -73,7 +73,7 @@ class Settings:
     def __init__(self):
         self.lock = threading.Lock()
         try:
-            self.data = json.loads(SETTINGS_FILE.read_text(encoding="utf-8"))
+            self.data = json.loads(SETTINGS_FILE.read_text(encoding="utf-8-sig"))
         except (OSError, ValueError):
             self.data = {}
         self.data.setdefault("recent", [])
