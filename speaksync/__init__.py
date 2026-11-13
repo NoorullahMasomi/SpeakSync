@@ -11,3 +11,6 @@ AUTHOR = "Noorullah Masomi"
 # Every copy of the app asks this place, once a day, whether a newer version exists.
 UPDATE_REPO = "Noorullahmasomi/SpeakSync"
 HOMEPAGE = f"https://github.com/{UPDATE_REPO}"
+
+# The maker's LinkedIn page (shown on the home screen and in About).
+LINKEDIN = "https://www.linkedin.com/in/noorullah-masomi-34226a29b/"

@@ -2,7 +2,7 @@
 
 **Your voice on any video.** Mark where you speak, read your script when the light is green, and get a finished video with subtitles.
 
-Free and open source (MIT). Made by **Noorullah Masomi**.
+Free and open source (MIT). Made by **Noorullah Masomi** — [LinkedIn](https://www.linkedin.com/in/noorullah-masomi-34226a29b/).
 
 [Download the newest version](https://github.com/Noorullahmasomi/SpeakSync/releases/latest) — Windows 10 / 11.
 

@@ -124,7 +124,8 @@ async function loadState() {
 }
 function drawHome() {
   if (!appState.app) return;
-  $("#aboutLine").textContent = `SpeakSync ${appState.version} · ${t("made_by")} ${appState.author} · ${t("free")}`;
+  $("#authorName").textContent = appState.author;
+  $("#aboutLine").textContent = `SpeakSync ${appState.version} · ${t("free")}`;
   const rec = appState.recent || [];
   $("#recentCard").hidden = !rec.length;
   $("#recent").innerHTML = rec.map((r, i) => `<button data-i="${i}" ${r.ok ? "" : "disabled"}><b>${esc(r.name)}</b><span class="path">${esc(r.path)}</span>${r.ok ? "" : `<span class="bad">${esc(t("missing"))}</span>`}</button>`).join("");
@@ -135,26 +136,28 @@ function drawHome() {
 }
 // ---- new project dialog
 let nv = null, folderTouched = false;
+function setFolder(p) { $("#nFolder").textContent = p; $("#nFolder").title = p; }
 function folderFor(name) { return `${appState.documents}\\${(name || "My video").replace(/[<>:"/\\|?*]+/g, " ").trim() || "My video"}`; }
 $("#newBtn").onclick = () => {
   nv = null; folderTouched = false;
-  $("#nVideo").textContent = t("no_video"); $("#nName").value = ""; $("#nScript").value = "";
-  $("#nFolder").textContent = folderFor(""); $("#nCreate").disabled = true; $("#newDlg").hidden = false;
+  $("#nVideo").textContent = t("no_video"); $("#nVideo").title = ""; $("#nFolder").title = ""; $("#nName").value = ""; $("#nScript").value = "";
+  setFolder(folderFor("")); $("#nCreate").disabled = true; $("#newDlg").hidden = false;
 };
 $("#nVideoBtn").onclick = async () => {
   $("#nVideoBtn").disabled = true;
   const r = await api("POST", "/api/pick/video").finally(() => $("#nVideoBtn").disabled = false);
   if (!r.ok) return;
   nv = r;
-  $("#nVideo").textContent = `${r.path}   (${fmt(r.duration, false)}${r.width ? `, ${r.width}×${r.height}` : ""})`;
+  $("#nVideo").title = r.path;
+  $("#nVideo").textContent = `${r.path.split(/[\/]/).pop()}   (${fmt(r.duration, false)}${r.width ? `, ${r.width}×${r.height}` : ""})`;
   if (!$("#nName").value) $("#nName").value = r.name;
-  if (!folderTouched) $("#nFolder").textContent = folderFor($("#nName").value);
+  if (!folderTouched) setFolder(folderFor($("#nName").value));
   $("#nCreate").disabled = false;
 };
-$("#nName").oninput = () => { if (!folderTouched) $("#nFolder").textContent = folderFor($("#nName").value); };
+$("#nName").oninput = () => { if (!folderTouched) setFolder(folderFor($("#nName").value)); };
 $("#nFolderBtn").onclick = async () => {
   const r = await api("POST", "/api/pick/folder", { start: $("#nFolder").textContent });
-  if (r.ok) { folderTouched = true; $("#nFolder").textContent = r.path; }
+  if (r.ok) { folderTouched = true; setFolder(r.path); }
 };
 $("#nCancel").onclick = () => $("#newDlg").hidden = true;
 $("#nCreate").onclick = async () => {
@@ -692,14 +695,18 @@ $$("#tabs button").forEach(b => b.onclick = () => showTab(b.dataset.tab));
 $("#closeBtn").onclick = closeProject;
 $("#uiLang").onchange = async () => { await loadLang($("#uiLang").value); api("POST", "/api/ui", { lang: uiLang }); };
 $("#helpBtn").onclick = () => { $("#helpBox").innerHTML = t("help_html") + `<div class="row"><span class="grow"></span><button class="primary" id="helpOk">OK</button></div>`; $("#helpDlg").hidden = false; $("#helpOk").onclick = () => $("#helpDlg").hidden = true; };
-$("#aboutLink").onclick = e => {
-  e.preventDefault();
-  $("#helpBox").innerHTML = `<h2>SpeakSync ${esc(appState.version)}</h2><p>${esc(t("about_p"))}</p><p>${esc(t("made_by"))} <b>${esc(appState.author)}</b></p>
-    <p><a href="#" id="hp">${esc(appState.homepage)}</a></p><p id="updLine" class="dim"></p>
+$("#aboutLink").onclick = () => {
+  $("#helpBox").innerHTML = `<div class="about-head"><img src="/static/icon.svg" alt=""><div><h2>SpeakSync ${esc(appState.version)}</h2>
+    <div class="dim">${esc(t("made_by"))} <b style="color:var(--text)">${esc(appState.author)}</b> · ${esc(t("free"))}</div></div></div>
+    <p>${esc(t("about_p"))}</p>
+    <div class="about-links"><button class="linkbtn li" id="liBtn"><span class="ico">in</span>${esc(t("linkedin"))}</button><button class="linkbtn" id="hp">${esc(t("source_code"))}</button>
+    <span class="dim small" style="direction:ltr">${esc(appState.homepage.replace("https://", ""))}</span></div>
+    <p id="updLine" class="dim"></p>
     <div class="row"><button id="chkUpd">${esc(t("check_updates"))}</button><span class="grow"></span><button class="primary" id="helpOk">OK</button></div>`;
   $("#helpDlg").hidden = false;
   $("#helpOk").onclick = () => $("#helpDlg").hidden = true;
-  $("#hp").onclick = ev => { ev.preventDefault(); api("POST", "/api/open", { what: "homepage" }); };
+  $("#hp").onclick = () => api("POST", "/api/open", { what: "homepage" });
+  $("#liBtn").onclick = () => api("POST", "/api/open", { what: "linkedin" });
   $("#chkUpd").onclick = async () => {
     $("#updLine").textContent = "…";
     const u = await api("GET", "/api/update");
@@ -709,6 +716,8 @@ $("#aboutLink").onclick = e => {
   };
 };
 $("#updateBtn").onclick = () => api("POST", "/api/open", { what: "update" });
+$("#linkedinBtn").onclick = () => api("POST", "/api/open", { what: "linkedin" });
+$("#githubBtn").onclick = () => api("POST", "/api/open", { what: "homepage" });
 $("#helpDlg").onclick = e => { if (e.target.id === "helpDlg") $("#helpDlg").hidden = true; };
 
 // "I am still here" - when the window closes, the program stops by itself

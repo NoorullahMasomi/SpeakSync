@@ -23,7 +23,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from . import APP_NAME, AUTHOR, HOMEPAGE, VERSION, updates
+from . import APP_NAME, AUTHOR, HOMEPAGE, LINKEDIN, VERSION, updates
 from .media import Job, MediaError, open_path, probe
 from .project import PROJECT_FILE, Project, ProjectError, script_text, srt_text
 
@@ -164,7 +164,7 @@ def api_state() -> dict:
     for f in SETTINGS.data["recent"]:
         p = Path(f)
         recent.append({"path": f, "name": p.name, "ok": (p / PROJECT_FILE).exists()})
-    return {"app": APP_NAME, "version": VERSION, "author": AUTHOR, "homepage": HOMEPAGE,
+    return {"app": APP_NAME, "version": VERSION, "author": AUTHOR, "homepage": HOMEPAGE, "linkedin": LINKEDIN,
             "ui_lang": SETTINGS.data.get("ui_lang", ""), "recent": recent,
             "documents": str(documents() / APP_NAME),
             "project": State.project.info() if State.project else None,
@@ -326,6 +326,8 @@ def api_open_path(body: dict) -> dict:
     what = body.get("what")
     if what == "homepage":
         webbrowser.open(HOMEPAGE)
+    elif what == "linkedin":
+        webbrowser.open(LINKEDIN)
     elif what == "update":
         u = SETTINGS.data.get("update") or {}
         webbrowser.open(u.get("page") or f"{HOMEPAGE}/releases/latest")

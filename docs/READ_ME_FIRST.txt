@@ -1,6 +1,7 @@
 SpeakSync - your voice on any video
 Free and open source. Made by Noorullah Masomi.
 https://github.com/Noorullahmasomi/SpeakSync
+LinkedIn: https://www.linkedin.com/in/noorullah-masomi-34226a29b/
 
 START
   Double-click SpeakSync.exe. The first time, click "Allow" when it asks for the microphone.
