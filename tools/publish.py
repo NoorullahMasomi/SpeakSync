@@ -70,7 +70,7 @@ def main() -> None:
         print(f"   {f.name}  {f.stat().st_size / 1e6:.1f} MB")
     raw = os.environ.get("SPEAKSYNC_GH_TOKEN") or getpass.getpass("GitHub token (hidden): ")
     # a paste can bring hidden characters (terminal paste marks, spaces, line ends) - a token has only these:
-    token = re.sub(r"\[20[01]~", "", raw)
+    token = re.sub(r"\x1b\[20[01]~", "", raw)
     token = re.sub(r"[^A-Za-z0-9_]", "", token)
     if not token:
         raise SystemExit("No token.")
