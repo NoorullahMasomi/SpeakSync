@@ -149,7 +149,7 @@ $("#nVideoBtn").onclick = async () => {
   if (!r.ok) return;
   nv = r;
   $("#nVideo").title = r.path;
-  $("#nVideo").textContent = `${r.path.split(/[\/]/).pop()}   (${fmt(r.duration, false)}${r.width ? `, ${r.width}×${r.height}` : ""})`;
+  $("#nVideo").textContent = `${r.path.split(/[\\/]/).pop()}   (${fmt(r.duration, false)}${r.width ? `, ${r.width}×${r.height}` : ""})`;
   if (!$("#nName").value) $("#nName").value = r.name;
   if (!folderTouched) setFolder(folderFor($("#nName").value));
   $("#nCreate").disabled = false;
