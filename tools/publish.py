@@ -68,9 +68,15 @@ def main() -> None:
     print(f"Publishing {APP_NAME} {VERSION} to https://github.com/{UPDATE_REPO}")
     for f in files:
         print(f"   {f.name}  {f.stat().st_size / 1e6:.1f} MB")
-    token = os.environ.get("SPEAKSYNC_GH_TOKEN") or getpass.getpass("GitHub token (hidden): ").strip()
+    raw = os.environ.get("SPEAKSYNC_GH_TOKEN") or getpass.getpass("GitHub token (hidden): ")
+    # a paste can bring hidden characters (terminal paste marks, spaces, line ends) - a token has only these:
+    token = re.sub(r"\[20[01]~", "", raw)
+    token = re.sub(r"[^A-Za-z0-9_]", "", token)
     if not token:
         raise SystemExit("No token.")
+    if not token.startswith(("ghp_", "github_pat_")):
+        print("Note: GitHub tokens start with ghp_ or github_pat_ - check that you copied the whole token.")
+    print(f"Token read: {len(token)} characters.")
     rel = call("POST", f"{API}/releases", token, json.dumps({
         "tag_name": f"v{VERSION}", "target_commitish": git("rev-parse", "HEAD"),
         "name": f"{APP_NAME} {VERSION}", "body": notes(), "draft": False, "prerelease": False}).encode("utf-8"))
